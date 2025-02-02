@@ -14,7 +14,10 @@ Find and replace all on all files (CMD+SHIFT+F):
 [![License][license-src]][license-href]
 [![Nuxt][nuxt-src]][nuxt-href]
 
-![](/docs/public/cover.png)
+[![](/docs/public/cover.png)](https://nuxt-gpt-module.vercel.app/)
+
+# See [docs →](![](/docs/public/cover.png))
+
 
 My new Nuxt module for doing amazing things.
 
