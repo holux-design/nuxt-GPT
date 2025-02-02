@@ -16,7 +16,7 @@ Find and replace all on all files (CMD+SHIFT+F):
 
 [![](/docs/public/cover.png)](https://nuxt-gpt-module.vercel.app/)
 
-# See [docs →](![](/docs/public/cover.png))
+# See [docs →](https://nuxt-gpt-module.vercel.app/)
 
 
 My new Nuxt module for doing amazing things.
