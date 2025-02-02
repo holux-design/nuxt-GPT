@@ -1,7 +1,6 @@
 import { fileURLToPath } from 'node:url'
 import {
   defineNuxtModule,
-  addPlugin,
   createResolver,
   addImports,
   addServerHandler,

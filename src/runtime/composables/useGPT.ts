@@ -105,9 +105,8 @@ const addContextData = (contextData: any) => {
       err,
     )
   }
-  finally {
-    return { send: sendInitialMessage, toStructured }
-  }
+
+  return { send: sendInitialMessage, toStructured }
 }
 
 /**
