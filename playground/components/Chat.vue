@@ -1,9 +1,10 @@
 <template>
-   <pre>{{ messages }}</pre>
-   <input
-      type="text"
-      v-model="input"
-      @keyup.enter="send(input, () => (input = ''))" />
+  <pre>{{ messages }}</pre>
+  <input
+    v-model="input"
+    type="text"
+    @keyup.enter="send(input, () => (input = ''))"
+  >
 </template>
 
 <script setup lang="ts">

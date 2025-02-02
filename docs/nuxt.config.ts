@@ -1,21 +1,21 @@
 export default defineNuxtConfig({
-   // https://github.com/nuxt-themes/docus
-   extends: ['@nuxt-themes/docus'],
+  // https://github.com/nuxt-themes/docus
+  extends: ['@nuxt-themes/docus'],
 
-   modules: ['../src/module', '@nuxtjs/tailwindcss'],
-   devtools: { enabled: true },
+  modules: ['../src/module', '@nuxtjs/tailwindcss'],
+  devtools: { enabled: true },
 
-   css: [
-      '~/assets/css/terminal.css',
-      '~/assets/css/shiki.css',
-      '~/assets/css/global.css',
-   ],
-   compatibilityDate: '2024-10-24',
+  css: [
+    '~/assets/css/terminal.css',
+    '~/assets/css/shiki.css',
+    '~/assets/css/global.css',
+  ],
+  compatibilityDate: '2024-10-24',
 
-   nitro: {
-      preset: 'vercel',
-      output: {
-         dir: '../.vercel/output',
-      },
-   },
+  nitro: {
+    preset: 'vercel',
+    output: {
+      dir: '../.vercel/output',
+    },
+  },
 })

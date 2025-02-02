@@ -1,10 +1,10 @@
 export default defineNuxtConfig({
-   modules: ['../src/module'],
+  modules: ['../src/module'],
 
-   gpt: {
-      apiKey: process.env.OPENAI_API_KEY,
-   },
+  devtools: { enabled: true },
+  compatibilityDate: '2025-01-30',
 
-   devtools: { enabled: true },
-   compatibilityDate: '2025-01-30',
+  gpt: {
+    apiKey: process.env.OPENAI_API_KEY,
+  },
 })
