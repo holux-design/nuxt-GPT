@@ -1,0 +1,4 @@
+.highlight-vue {
+	max-width: calc(100vw - (3 * var(--elements-container-padding-mobile)));
+	overflow: auto;
+}

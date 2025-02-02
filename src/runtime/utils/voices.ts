@@ -1,0 +1,10 @@
+export type VOICE =
+   | 'alloy'
+   | 'ash'
+   | 'coral'
+   | 'echo'
+   | 'fable'
+   | 'onyx'
+   | 'nova'
+   | 'sage'
+   | 'shimmer'
