@@ -12,6 +12,15 @@
       "name": "Lukas Hofstätter",
       "email": "office@holux-design.at"
    },
+   "keywords": [
+      "nuxt3",
+      "nuxt",
+      "nuxt.js",
+      "nuxt-chatgpt",
+      "chatgpt",
+      "openai",
+      "4o-mini"
+   ],
    "license": "MIT",
    "type": "module",
    "exports": {
