@@ -1,10 +1,28 @@
 import { defineEventHandler, getRequestURL, useRuntimeConfig } from '#imports'
+import * as jose from 'jose'
 
 export default defineEventHandler(async (event) => {
-  if (getRequestURL(event).pathname.includes('/api/chat-gpt/')) {
-    event.context.auth = {
-      ...event.context.auth,
-      gpt: { apiKey: useRuntimeConfig().gpt.apiKey },
-    }
-  }
+   if (getRequestURL(event).pathname.includes('/api/chat-gpt/functions/')) {
+      const token = event.headers.get('Authorization')
+      if (!token)
+         throw createError({
+            statusCode: 401,
+            message: 'No Authorization header present',
+         })
+
+      try {
+         await jose.jwtVerify(
+            token,
+            new TextEncoder().encode(
+               useRuntimeConfig().gpt.securityTokenSecret,
+            ),
+            { algorithms: ['HS256'] },
+         )
+      } catch (err) {
+         throw createError({
+            statusCode: 403,
+            message: 'Provided token in Authorization header is not valid',
+         })
+      }
+   }
 })
