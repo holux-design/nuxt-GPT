@@ -1,13 +1,15 @@
 import type { z } from 'zod'
 import { zodToJsonSchema } from 'zod-to-json-schema'
-import type { AUDIO_MODEL } from '../utils/audio_models'
-import type { VOICE } from '../utils/voices'
+import type { AUDIO_MODEL } from '../types/Audio_model'
+import type { VOICE } from '../types/Voice'
 import { uuidv4 } from '../utils/uuid'
 import { now } from '../utils/time'
+import type { Chat } from '../types/Chat'
+import type { Message } from '../types/Message'
 import { ref } from '#imports'
 
 const message = ref<string>('')
-const chatHistory = ref<{ [chatID: string]: Message[] }>({})
+const chatHistory = ref<{ [chatID: string]: Chat }>({})
 
 /**
  * AI Utility Hook
@@ -52,29 +54,62 @@ const toStructured = async <T>(
 const sendChatMessage = async (
   prompt: string,
   chatUUID: string,
+  options?: {
+    stream?: boolean
+  },
 ): Promise<{ answer: string }> => {
+  const requestUUID = uuidv4()
+
   const userMessage: Message = {
+    id: uuidv4(),
     role: 'user',
     content: prompt,
     datetime_js: now(),
   }
 
-  chatHistory.value[chatUUID].push(userMessage)
+  chatHistory.value[chatUUID].messages.push(userMessage)
 
+  if (options?.stream) {
+    chatHistory.value[chatUUID].messages.push({
+      id: requestUUID,
+      role: 'assistant',
+      content: '',
+      datetime_js: now(),
+    })
+  }
+
+  chatHistory.value[chatUUID].status = 'thinking'
   const response: any = await $fetch('/api/chat-gpt/chat', {
     method: 'POST',
     body: {
-      messages: chatHistory.value[chatUUID],
+      messages: chatHistory.value[chatUUID].messages,
     },
   })
 
   const answer = response[0].message?.content
 
-  chatHistory.value[chatUUID].push({
-    role: 'assistant',
-    content: answer,
-    datetime_js: now(),
-  })
+  if (options?.stream) {
+    chatHistory.value[chatUUID].status = 'streaming'
+    let i = 0
+    for (const word of answer.split(' ')) {
+      chatHistory.value[chatUUID].messages.find(
+        m => m.id == requestUUID,
+      )!.content
+            += `${word}` + (i != answer.split(' ').length - 1 ? ' ' : '')
+      await new Promise(r => setTimeout(r, 50))
+      i++
+    }
+    chatHistory.value[chatUUID].status = 'idle'
+  }
+  else {
+    chatHistory.value[chatUUID].status = 'idle'
+    chatHistory.value[chatUUID].messages.push({
+      id: requestUUID,
+      role: 'assistant',
+      content: answer,
+      datetime_js: now(),
+    })
+  }
 
   return { answer }
 }
@@ -130,29 +165,29 @@ const toSpeech = async (options?: {
   return `data:audio/mp3;base64,${audioBase64}`
 }
 
-type Message = {
-  role: 'system' | 'user' | 'assistant'
-  content: string
-  datetime_js: number
-}
 /**
  * Starts a new chat session with an optional system prompt to prime the Assistant.
  * @param {string} [systemPrompt] - Optional initial system message.
  * @returns {{ uuid: string; messages: Message[], send:Function}} Chat session object with UUID and messaging functionality.
  */
-const createChat = (systemPrompt?: string) => {
+const createChat = (options?: { systemPrompt?: string, stream?: boolean }) => {
   const chatUUID = uuidv4()
-  chatHistory.value[chatUUID] = []
+  chatHistory.value[chatUUID] = {
+    id: chatUUID,
+    status: 'idle',
+    messages: [],
+  }
 
-  if (systemPrompt)
-    chatHistory.value[chatUUID].push({
+  if (options?.systemPrompt)
+    chatHistory.value[chatUUID].messages.push({
       role: 'system',
-      content: systemPrompt,
+      content: options?.systemPrompt,
       datetime_js: now(),
     })
   return {
-    uuid: chatUUID,
-    messages: chatHistory.value[chatUUID],
+    id: chatUUID,
+    messages: chatHistory.value[chatUUID].messages,
+    status: computed(() => chatHistory.value[chatUUID].status),
     /**
      * Sends a chat message asynchronously and optionally calls a onSubmit callback.
      *
@@ -162,7 +197,7 @@ const createChat = (systemPrompt?: string) => {
      */
     send: async (prompt: string, onSubmit?: Function) => {
       !!onSubmit && onSubmit()
-      await sendChatMessage(prompt, chatUUID)
+      await sendChatMessage(prompt, chatUUID, { stream: options?.stream })
     },
   }
 }

@@ -1,4 +1,10 @@
+<script setup lang="ts">
+const { messages, send, status } = useGPT().createChat({ stream: true })
+const input = ref<string>('')
+</script>
+
 <template>
+  <pre>Status: {{ status }}</pre>
   <pre>{{ messages }}</pre>
   <input
     v-model="input"
@@ -6,8 +12,3 @@
     @keyup.enter="send(input, () => (input = ''))"
   >
 </template>
-
-<script setup lang="ts">
-const { messages, send } = useGPT().createChat()
-const input = ref<string>('')
-</script>

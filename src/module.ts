@@ -6,8 +6,8 @@ import {
   addServerHandler,
 } from '@nuxt/kit'
 import defu from 'defu'
-import type { MODEL } from './runtime/utils/models'
-import type { VOICE } from './runtime/utils/voices'
+import type { MODEL } from './runtime/types/Model'
+import type { VOICE } from './runtime/types/Voice'
 
 // Module options TypeScript interface definition
 export interface ModuleOptions {
