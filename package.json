@@ -1,6 +1,6 @@
 {
    "name": "nuxt-gpt",
-   "version": "0.1.1",
+   "version": "0.1.2",
    "description": "Plug and Play ChatGPT for Nuxt",
    "repository": "holux-design/nuxt-gpt",
    "contributors": [
