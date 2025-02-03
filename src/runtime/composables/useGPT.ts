@@ -6,7 +6,7 @@ import { uuidv4 } from '../utils/uuid'
 import { now } from '../utils/time'
 import type { Chat } from '../types/Chat'
 import type { Message } from '../types/Message'
-import { ref } from '#imports'
+import { ref, computed } from '#imports'
 
 const message = ref<string>('')
 const chatHistory = ref<{ [chatID: string]: Chat }>({})
