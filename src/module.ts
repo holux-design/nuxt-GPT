@@ -1,9 +1,9 @@
 import { fileURLToPath } from 'node:url'
 import {
-   defineNuxtModule,
-   createResolver,
-   addImports,
-   addServerHandler,
+  defineNuxtModule,
+  createResolver,
+  addImports,
+  addServerHandler,
 } from '@nuxt/kit'
 import defu from 'defu'
 import type { MODEL } from './runtime/types/Model'
@@ -12,83 +12,83 @@ import { uuidv4 } from './runtime/utils/uuid'
 
 // Module options TypeScript interface definition
 export interface ModuleOptions {
-   apiKey: string
-   model: MODEL
-   voice: VOICE
+  apiKey: string
+  model: MODEL
+  voice: VOICE
 }
 
 const configKey = 'gpt'
 
 export default defineNuxtModule<ModuleOptions>({
-   meta: {
-      name: 'nuxt-gpt',
-      configKey,
-      compatibility: {
-         nuxt: '^3.0.0',
+  meta: {
+    name: 'nuxt-gpt',
+    configKey,
+    compatibility: {
+      nuxt: '^3.0.0',
+    },
+  },
+  // Default configuration options of the Nuxt module
+  defaults: {
+    model: 'gpt-4o-mini',
+    voice: 'alloy',
+  },
+  setup(_options, _nuxt) {
+    const { resolve } = createResolver(import.meta.url)
+    const runtimeDir = fileURLToPath(new URL('./runtime', import.meta.url))
+
+    if (!_options.apiKey) {
+      return console.warn(`[nuxt-gpt]: No apiKey provided in nuxt.config`)
+    }
+
+    _nuxt.options.runtimeConfig[configKey] = defu(
+      _nuxt.options.runtimeConfig[configKey] as any,
+      {
+        apiKey: _options.apiKey,
+        model: _options.model,
+        voice: _options.voice,
+        securityTokenSecret: uuidv4(),
       },
-   },
-   // Default configuration options of the Nuxt module
-   defaults: {
-      model: 'gpt-4o-mini',
-      voice: 'alloy',
-   },
-   setup(_options, _nuxt) {
-      const { resolve } = createResolver(import.meta.url)
-      const runtimeDir = fileURLToPath(new URL('./runtime', import.meta.url))
+    )
 
-      if (!_options.apiKey) {
-         return console.warn(`[nuxt-gpt]: No apiKey provided in nuxt.config`)
-      }
+    addImports({
+      name: 'useGPT',
+      as: 'useGPT',
+      from: resolve('runtime/composables/useGPT'), // load composable from plugin
+    })
 
-      _nuxt.options.runtimeConfig[configKey] = defu(
-         _nuxt.options.runtimeConfig[configKey] as any,
-         {
-            apiKey: _options.apiKey,
-            model: _options.model,
-            voice: _options.voice,
-            securityTokenSecret: uuidv4(),
-         },
-      )
+    addServerHandler({
+      route: '/api/chat-gpt/functions/structured-chat-completion',
+      method: 'post',
+      handler: resolve(
+        runtimeDir,
+        'server/api/chat-gpt/functions/structured-chat-completion',
+      ),
+    })
+    addServerHandler({
+      route: '/api/chat-gpt/functions/chat',
+      method: 'post',
+      handler: resolve(runtimeDir, 'server/api/chat-gpt/functions/chat'),
+    })
+    addServerHandler({
+      route: '/api/chat-gpt/functions/text-to-speech',
+      method: 'post',
+      handler: resolve(
+        runtimeDir,
+        'server/api/chat-gpt/functions/text-to-speech',
+      ),
+    })
+    addServerHandler({
+      route: '/api/chat-gpt/auth/issue-token',
+      method: 'get',
+      handler: resolve(runtimeDir, 'server/api/chat-gpt/auth/issue-token'),
+    })
 
-      addImports({
-         name: 'useGPT',
-         as: 'useGPT',
-         from: resolve('runtime/composables/useGPT'), // load composable from plugin
-      })
+    addServerHandler({
+      route: '',
+      middleware: true,
+      handler: resolve(runtimeDir, 'server/middleware/chat-gpt-auth'),
+    })
 
-      addServerHandler({
-         route: '/api/chat-gpt/functions/structured-chat-completion',
-         method: 'post',
-         handler: resolve(
-            runtimeDir,
-            'server/api/chat-gpt/functions/structured-chat-completion',
-         ),
-      })
-      addServerHandler({
-         route: '/api/chat-gpt/functions/chat',
-         method: 'post',
-         handler: resolve(runtimeDir, 'server/api/chat-gpt/functions/chat'),
-      })
-      addServerHandler({
-         route: '/api/chat-gpt/functions/text-to-speech',
-         method: 'post',
-         handler: resolve(
-            runtimeDir,
-            'server/api/chat-gpt/functions/text-to-speech',
-         ),
-      })
-      addServerHandler({
-         route: '/api/chat-gpt/auth/issue-token',
-         method: 'get',
-         handler: resolve(runtimeDir, 'server/api/chat-gpt/auth/issue-token'),
-      })
-
-      addServerHandler({
-         route: '',
-         middleware: true,
-         handler: resolve(runtimeDir, 'server/middleware/chat-gpt-auth'),
-      })
-
-      _nuxt.options.build.transpile.push(runtimeDir)
-   },
+    _nuxt.options.build.transpile.push(runtimeDir)
+  },
 })

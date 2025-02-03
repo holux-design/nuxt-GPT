@@ -5,29 +5,30 @@ import { createError, defineEventHandler, readBody } from 'h3'
 import { useRuntimeConfig } from '#imports'
 
 export default defineEventHandler(async (event) => {
-   const { message, responseSchema } = await readBody(event)
+  const { message, responseSchema } = await readBody(event)
 
-   const openai = new OpenAI({ apiKey: useRuntimeConfig().gpt.apiKey })
+  const openai = new OpenAI({ apiKey: useRuntimeConfig().gpt.apiKey })
 
-   try {
-      const completion = await openai.beta.chat.completions.parse({
-         model: useRuntimeConfig().gpt?.model || 'gpt-4o-mini',
-         messages: [{ role: 'user', content: message }],
-         response_format: {
-            type: 'json_schema',
-            json_schema: {
-               name: 'responseSchema',
-               strict: true,
-               schema: responseSchema,
-            },
-         },
-      })
+  try {
+    const completion = await openai.beta.chat.completions.parse({
+      model: useRuntimeConfig().gpt?.model || 'gpt-4o-mini',
+      messages: [{ role: 'user', content: message }],
+      response_format: {
+        type: 'json_schema',
+        json_schema: {
+          name: 'responseSchema',
+          strict: true,
+          schema: responseSchema,
+        },
+      },
+    })
 
-      return completion.choices[0].message.parsed
-   } catch (error: any) {
-      throw createError({
-         statusCode: 500,
-         message: error?.message || 'Failed to forward request to OpenAI API',
-      })
-   }
+    return completion.choices[0].message.parsed
+  }
+  catch (error: any) {
+    throw createError({
+      statusCode: 500,
+      message: error?.message || 'Failed to forward request to OpenAI API',
+    })
+  }
 })
