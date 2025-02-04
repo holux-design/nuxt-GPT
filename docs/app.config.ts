@@ -3,7 +3,7 @@ export default defineAppConfig({
   docus: {
     title: 'nuxt-gpt',
     description: 'Easy to use GPT for Nuxt',
-    image: 'https://nuxt-gpt-holux.vercel.app/cover.png',
+    image: 'https://github.com/holux-design/nuxt-GPT/raw/main/docs/public/cover.png',
     socials: {
       github: 'holux-design/nuxt-gpt',
       nuxt: {
