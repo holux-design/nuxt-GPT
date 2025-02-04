@@ -3,7 +3,8 @@ import { defineEventHandler, getRequestURL, useRuntimeConfig } from '#imports'
 
 export default defineEventHandler(async (event) => {
   if (getRequestURL(event).pathname.includes('/api/chat-gpt/functions/')) {
-    const token = event.headers.get('Authorization')
+    const [_, token] = event.headers.get('Authorization')!.split(' ')
+
     if (!token)
       throw createError({
         statusCode: 401,
@@ -13,9 +14,7 @@ export default defineEventHandler(async (event) => {
     try {
       await jose.jwtVerify(
         token,
-        new TextEncoder().encode(
-          useRuntimeConfig().gpt.securityTokenSecret,
-        ),
+        new TextEncoder().encode(useRuntimeConfig().gpt.tokenSecret),
         { algorithms: ['HS256'] },
       )
     }

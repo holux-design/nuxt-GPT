@@ -4,6 +4,7 @@ import {
   createResolver,
   addImports,
   addServerHandler,
+  addPlugin,
 } from '@nuxt/kit'
 import defu from 'defu'
 import type { MODEL } from './runtime/types/Model'
@@ -46,7 +47,7 @@ export default defineNuxtModule<ModuleOptions>({
         apiKey: _options.apiKey,
         model: _options.model,
         voice: _options.voice,
-        securityTokenSecret: uuidv4(),
+        tokenSecret: uuidv4(),
       },
     )
 
@@ -77,17 +78,14 @@ export default defineNuxtModule<ModuleOptions>({
         'server/api/chat-gpt/functions/text-to-speech',
       ),
     })
-    addServerHandler({
-      route: '/api/chat-gpt/auth/issue-token',
-      method: 'get',
-      handler: resolve(runtimeDir, 'server/api/chat-gpt/auth/issue-token'),
-    })
 
     addServerHandler({
       route: '',
       middleware: true,
       handler: resolve(runtimeDir, 'server/middleware/chat-gpt-auth'),
     })
+
+    addPlugin(resolve(runtimeDir, 'plugins/gpt-generate-token'))
 
     _nuxt.options.build.transpile.push(runtimeDir)
   },

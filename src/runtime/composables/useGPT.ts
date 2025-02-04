@@ -44,7 +44,9 @@ const toStructured = async <T>(
   return (await $fetch('/api/chat-gpt/functions/structured-chat-completion', {
     method: 'POST',
     headers: {
-      Authorization: await $fetch('/api/chat-gpt/auth/issue-token'),
+      Authorization: `Bearer ${
+        (useNuxtApp().$config.public.gpt as { token: string }).token
+      }`,
     },
     body: {
       message: message.value,
@@ -85,7 +87,9 @@ const sendChatMessage = async (
   const response: any = await $fetch('/api/chat-gpt/functions/chat', {
     method: 'POST',
     headers: {
-      Authorization: await $fetch('/api/chat-gpt/auth/issue-token'),
+      Authorization: `Bearer ${
+        (useNuxtApp().$config.public.gpt as { token: string }).token
+      }`,
     },
     body: {
       messages: chatHistory.value[chatUUID].messages,
@@ -124,7 +128,9 @@ const sendInitialMessage = async (): Promise<{ answer: string }> => {
   const response: any = await $fetch('/api/chat-gpt/functions/chat', {
     method: 'POST',
     headers: {
-      Authorization: await $fetch('/api/chat-gpt/auth/issue-token'),
+      Authorization: `Bearer ${
+        (useNuxtApp().$config.public.gpt as { token: string }).token
+      }`,
     },
     body: {
       messages: [{ role: 'user', content: message.value }],
@@ -167,7 +173,9 @@ const toSpeech = async (options?: {
     {
       method: 'POST',
       headers: {
-        Authorization: await $fetch('/api/chat-gpt/auth/issue-token'),
+        Authorization: `Bearer ${
+          (useNuxtApp().$config.public.gpt as { token: string }).token
+        }`,
       },
       body: {
         input: message.value,
