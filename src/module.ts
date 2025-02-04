@@ -14,6 +14,7 @@ import { uuidv4 } from './runtime/utils/uuid'
 // Module options TypeScript interface definition
 export interface ModuleOptions {
   apiKey: string
+  protectAPI: boolean
   model: MODEL
   voice: VOICE
 }
@@ -79,13 +80,15 @@ export default defineNuxtModule<ModuleOptions>({
       ),
     })
 
-    addServerHandler({
-      route: '',
-      middleware: true,
-      handler: resolve(runtimeDir, 'server/middleware/chat-gpt-auth'),
-    })
+    if (_options.protectAPI != false) {
+      addServerHandler({
+        route: '',
+        middleware: true,
+        handler: resolve(runtimeDir, 'server/middleware/chat-gpt-auth'),
+      })
 
-    addPlugin(resolve(runtimeDir, 'plugins/gpt-generate-token'))
+      addPlugin(resolve(runtimeDir, 'plugins/gpt-generate-token'))
+    }
 
     _nuxt.options.build.transpile.push(runtimeDir)
   },
